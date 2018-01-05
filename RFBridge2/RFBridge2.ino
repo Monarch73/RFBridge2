@@ -111,7 +111,7 @@ void setup() {
 		else if (error == OTA_END_ERROR) Serial.println("End Failed");
 	});
 	ArduinoOTA.begin();
-	Serial.println("Ready");
+	Serial.println("Hue Emulation startet: " + WiFi.localIP().toString());
 
 	otaEnabled = true;
 
@@ -124,4 +124,5 @@ void loop() {
 	{
 		ArduinoOTA.handle();
 	}
+	server->handleClient();
 }

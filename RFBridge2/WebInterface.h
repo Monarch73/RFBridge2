@@ -29,7 +29,9 @@ public:
 private:
 	static RCSwitch* _mySwitch;
 	static ESP8266WebServer* _myServer;
+	static char *_hueId;
 	static void SendJson(DataJsonInterface* data);
+	
 };
 
 #endif

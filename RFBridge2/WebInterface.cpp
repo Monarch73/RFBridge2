@@ -27,6 +27,7 @@ char HTML_SSIDOK[] PROGMEM =
 EStore *WebInterface::estore;
 RCSwitch *WebInterface::_mySwitch;
 ESP8266WebServer* WebInterface::_myServer;
+char * WebInterface::_hueId;
 
 void WebInterface::HandleSetupRoot()
 {
@@ -74,17 +75,23 @@ void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server)
 {
 	_mySwitch = rc;
 	_myServer = server;
+	String mac = WiFi.macAddress();
+	mac.replace(":", "");
+	mac = mac.substring(0, 6) + "FFFE" + mac.substring(6);
+	_hueId = strdup(mac.c_str());
+
 }
 
 void WebInterface::ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
 	switch (method) {
 	case HTTP_GET: {
 		DataJsonConfig *jsonConfig = new DataJsonConfig();
-		jsonConfig->bridgeId = NULL;
-		jsonConfig->iPAdress = (char *)WiFi.localIP().toString().c_str();
-		jsonConfig->mac = (char *)WiFi.macAddress().c_str();
+		jsonConfig->bridgeId = _hueId;
+		jsonConfig->iPAdress = (char *)strdup(WiFi.localIP().toString().c_str());
+		jsonConfig->mac = (char *)strdup(WiFi.macAddress().c_str());
 		SendJson(jsonConfig);
-
+		free(jsonConfig->mac);
+		free(jsonConfig->iPAdress);
 		break;
 	}
 	case HTTP_PUT: {

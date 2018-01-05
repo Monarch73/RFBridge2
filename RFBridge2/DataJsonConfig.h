@@ -37,7 +37,7 @@ public:
 
 		JsonObject& root = jsonBuffer.createObject();
 		root["name"] = "hue emulator";
-		root["swversion"] = "";
+		root["swversion"] = "81012917";
 		root["bridgeid"] = bridgeId;
 		root["portalservices"] = (bool)false;
 
@@ -51,8 +51,8 @@ public:
 		root["localtime"] = "2017-12-03T12:07:32";
 		root["timezone"] = "Europe/London";
 
-		root["whitelist"] = "{""api"":{""name"":""clientname#devicename""}}";
-		root["swupdate"] = RawJson("{""text"":"""", ""notify"" : false, ""updatestate"" : 0, ""url"" : """"}");
+		root["whitelist"] = RawJson("{\"api\":{\"name\":\"clientname#devicename\"}}");
+		root["swupdate"] = RawJson("{\"text\":\"\", \"notify\" : false, \"updatestate\" : 0, \"url\" : \"\"}");
 
 		root.printTo(buffer, len);
 		
