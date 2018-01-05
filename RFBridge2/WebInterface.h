@@ -13,6 +13,7 @@
 #include <RCSwitch.h>
 #include "EStore.h"
 #include "WcFnRequestHandler.h"
+#include "DataJsonInterface.h"
 
 class WebInterface
 {
@@ -28,6 +29,7 @@ public:
 private:
 	static RCSwitch* _mySwitch;
 	static ESP8266WebServer* _myServer;
+	static void SendJson(DataJsonInterface* data);
 };
 
 #endif

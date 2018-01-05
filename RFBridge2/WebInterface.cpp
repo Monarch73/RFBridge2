@@ -4,6 +4,7 @@
 
 #include "WebInterface.h"
 #include <ArduinoJson.h>
+#include "DataJsonConfig.h"
 
 char HTML_HEADER[] PROGMEM = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>RFBridge</title><link rel=\"stylesheet/less\" type=\"text/css\" href=\"http://www.monarch.de/c64-theme/css/style.css\" />"
 "<script src=\"http://www.monarch.de/c64-theme/js/less-1.3.0.min.js\" type=\"text/javascript\"></script><script>function changeFont(font) {document.getElementById('font-div').className = font; }"
@@ -78,6 +79,12 @@ void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server)
 void WebInterface::ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
 	switch (method) {
 	case HTTP_GET: {
+		DataJsonConfig *jsonConfig = new DataJsonConfig();
+		jsonConfig->bridgeId = NULL;
+		jsonConfig->iPAdress = (char *)WiFi.localIP().toString().c_str();
+		jsonConfig->mac = (char *)WiFi.macAddress().c_str();
+		SendJson(jsonConfig);
+
 		break;
 	}
 	case HTTP_PUT: {
@@ -87,4 +94,11 @@ void WebInterface::ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTP
 	default:
 		break;
 	}
+}
+
+void WebInterface::SendJson(DataJsonInterface * data)
+{
+	char outputBuffer[1024];
+	data->ToOutput((char*)&outputBuffer, 1024);
+	_myServer->send(200, "application/json", outputBuffer);
 }

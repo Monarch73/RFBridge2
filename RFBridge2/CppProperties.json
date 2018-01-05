@@ -1,0 +1,47 @@
+{
+  "configurations": [
+    {
+      "name": "Visual Micro",
+      "intelliSenseMode": "msvc-x64",
+      "includePath": [
+        "${projectRoot}..\\RFBridge2",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\libraries\\ESP8266WebServer\\src",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\libraries\\ESP8266WiFi\\src",
+        "${projectRoot}..\\libraries\\rc-switch",
+        "${projectRoot}..\\libraries\\ArduinoJson\\src",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\libraries\\ESP8266mDNS",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\libraries\\ArduinoOTA",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\libraries\\EEPROM",
+        "${projectRoot}..\\..\\..\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\IDE\\Extensions\\pbd1usl1.2ll\\Micro Platforms\\visualmicro\\ide\\libraries",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\libraries",
+        "${projectRoot}..\\libraries",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\cores\\esp8266",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\cores\\esp8266\\libb64",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\cores\\esp8266\\spiffs",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\cores\\esp8266\\umm_malloc",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\variants\\nodemcu",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\tools\\sdk\\include",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\tools\\sdk\\lwip\\include",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\tools\\xtensa-lx106-elf\\xtensa-lx106-elf\\include\\c++\\4.8.2",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\tools\\xtensa-lx106-elf\\xtensa-lx106-elf\\include\\c++\\4.8.2\\xtensa-lx106-elf",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\tools\\xtensa-lx106-elf\\xtensa-lx106-elf\\include",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\tools\\xtensa-lx106-elf\\lib\\gcc\\xtensa-lx106-elf\\4.8.2\\include",
+        "${projectRoot}..\\hardware\\esp8266\\esp8266\\tools\\sdk\\include"
+      ],
+      "defines": [
+        "__ESP8266_ESp8266__",
+        "__ESP8266_ESP8266__",
+        "__ets__",
+        "ICACHE_FLASH",
+        "F_CPU=80000000L",
+        "LWIP_OPEN_SRC",
+        "ARDUINO=10801",
+        "ARDUINO_ESP8266_NODEMCU",
+        "ARDUINO_ARCH_ESP8266",
+        "ESP8266",
+        "__cplusplus=201103L",
+        "_VMICRO_INTELLISENSE"
+      ]
+    }
+  ]
+}
