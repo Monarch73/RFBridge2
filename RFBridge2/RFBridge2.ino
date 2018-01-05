@@ -89,9 +89,8 @@ void setup() {
 
 	server = new ESP8266WebServer(80);
 	WebInterface::SetDevices(&mySwitch, server);
-	server->on("/", HTTP_GET, WebInterface::HandleRoot);
 	on(WebInterface::ConfigFn, "/api/*/config", HTTP_ANY);
-
+	on(WebInterface::HandleAngular,"/", HTTP_ANY);
 	server->begin();
 	ArduinoOTA.onStart([]() {
 		Serial.println("Start updating spiffs");
