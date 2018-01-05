@@ -12,6 +12,7 @@
 #include <ESP8266WebServer.h>
 #include <RCSwitch.h>
 #include "EStore.h"
+#include "WcFnRequestHandler.h"
 
 class WebInterface
 {
@@ -20,7 +21,9 @@ public:
 	static void HandleSetupRoot();
 	static void HandleFormat();
 	static void handleSetupSSID();
+	static void HandleRoot();
 	static void SetDevices(RCSwitch *mySwitch, ESP8266WebServer *myServer);
+	static void ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
 
 private:
 	static RCSwitch* _mySwitch;

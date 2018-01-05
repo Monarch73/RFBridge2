@@ -3,6 +3,7 @@
 // 
 
 #include "WebInterface.h"
+#include <ArduinoJson.h>
 
 char HTML_HEADER[] PROGMEM = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>RFBridge</title><link rel=\"stylesheet/less\" type=\"text/css\" href=\"http://www.monarch.de/c64-theme/css/style.css\" />"
 "<script src=\"http://www.monarch.de/c64-theme/js/less-1.3.0.min.js\" type=\"text/javascript\"></script><script>function changeFont(font) {document.getElementById('font-div').className = font; }"
@@ -63,8 +64,27 @@ void WebInterface::HandleFormat()
 	WebInterface::HandleSetupRoot();
 }
 
+void WebInterface::HandleRoot()
+{
+
+}
+
 void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server)
 {
 	_mySwitch = rc;
 	_myServer = server;
+}
+
+void WebInterface::ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
+	switch (method) {
+	case HTTP_GET: {
+		break;
+	}
+	case HTTP_PUT: {
+		// TODO: actually store this
+		break;
+	}
+	default:
+		break;
+	}
 }
