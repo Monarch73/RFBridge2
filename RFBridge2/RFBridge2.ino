@@ -91,6 +91,11 @@ void setup() {
 	WebInterface::SetDevices(&mySwitch, server);
 	on(WebInterface::ConfigFn, "/api/*/config", HTTP_ANY);
 	on(WebInterface::HandleAngular,"/", HTTP_ANY);
+	on(WebInterface::HandleAngular, "styles.89c7d201f868ab33b8ed.bundle.css", HTTP_ANY);
+	on(WebInterface::HandleAngular, "inline.6022114626152249fbb3.bundle.js", HTTP_ANY);
+	on(WebInterface::HandleAngular, "polyfills.5b59249e2a37b3779465.bundle.js", HTTP_ANY);
+	on(WebInterface::HandleAngular, "main.e8c6b586049960613364.bundle.js", HTTP_ANY);
+
 	server->begin();
 	ArduinoOTA.onStart([]() {
 		Serial.println("Start updating spiffs");

@@ -43,19 +43,19 @@ char * WebInterface::_hueId;
 void WebInterface::HandleAngular(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
 {
 	Serial.println(requestUri);
-	if (requestUri.startsWith("styles"))
+	if (requestUri.startsWith("/styles"))
 	{
 		_myServer->send_P(200, "text/css",  ANGULAR_STYLES);
 	}
-	else if (requestUri.startsWith("polyfill"))
+	else if (requestUri.startsWith("/polyfill"))
 	{
 		_myServer->send_P(200, "text/javascript", ANGULAR_POLYFILLS);
 	}
-	else if (requestUri.startsWith("inline"))
+	else if (requestUri.startsWith("/inline"))
 	{
 		_myServer->send_P(200, "text/javascript", ANGULAR_INLINE);
 	}
-	else if (requestUri.startsWith("main"))
+	else if (requestUri.startsWith("/main"))
 	{
 		_myServer->send_P(200, "text/javascript", ANGULAR_MAIN);
 	}
