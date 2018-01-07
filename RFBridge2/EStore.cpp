@@ -284,22 +284,27 @@ void EStore::dipSwitchDelete(int no)
 	EEPROM.commit();
 	Serial.println("switch removed from EEPROM");
 #else
-
+	Serial.println("file open");
 	File fs = SPIFFS.open("/EEPROM.TXT", "r+");
 	if (!fs)
 	{
 		Serial.println("SPIFFS unable to open storage");
 		return;
 	}
-
+	Serial.println("seeking");
 	if (fs.seek(4 + (no * sizeof(dipswitches_struct)), SeekSet) == false)
 	{
 		Serial.println("Positioning failed");
 		return;
 	}
 
+	Serial.println("writing");
 	fs.write(0);
+	Serial.println("flushing");
+
 	fs.flush();
+	Serial.println("closing");
+
 	fs.close();
 
 #endif // !USE_SPIFFS

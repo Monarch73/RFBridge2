@@ -43,6 +43,16 @@ char * WebInterface::_hueId;
 void WebInterface::HandleAngular(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
 {
 	Serial.println(requestUri);
+	_myServer->sendHeader("Cache-Control", " max-age=120");
+	_myServer->sendHeader("Last-Modified", "Wed, 21 Oct 2019 07:28:00 GMT");
+	
+	if (_myServer->hasHeader("If-Modified-Since"))
+	{
+		Serial.println("serve from cache");
+		_myServer->send(304, "");
+		return;
+	}
+
 	if (requestUri.startsWith("/styles"))
 	{
 		_myServer->send_P(200, "text/css",  ANGULAR_STYLES);
@@ -64,6 +74,119 @@ void WebInterface::HandleAngular(WcFnRequestHandler *handler, String requestUri,
 		_myServer->send_P(200, "text/html", ANGULAR_INDEX);
 	}
 }
+
+void WebInterface::HandleJsonList()
+{
+	typedef struct dipswitches_struct dipswitch;
+	dipswitch dp;
+	char *responseContent = (char*)malloc(4096);
+	if (responseContent == NULL)
+	{
+		Serial.println("out of memory");
+		return;
+	}
+
+	strcpy(responseContent, "[ ");
+
+	bool entry = false;
+	for (int i = 0; i < N_DIPSWITCHES; i++)
+	{
+		Serial.print("Loading");
+		Serial.println(i);
+		WebInterface::estore->dipSwitchLoad(i, &dp);
+		if (dp.name[0] != 0)
+		{
+			char buf[49];
+			entry = true;
+			sprintf(buf, " { \"i\": %d, \"n\": \"%s\" },", i, dp.name);
+			strcat(responseContent, buf);
+		}
+		else
+		{
+			Serial.print("skipping");
+			Serial.println(i);
+		}
+	}
+	if (entry)
+	{
+		responseContent[strlen(responseContent) - 1] = 0;
+	}
+
+	strcat(responseContent, " ]");
+	_myServer->sendHeader("Access-Control-Allow-Origin", "*");
+	_myServer->send(200, "application/json", responseContent);
+	free(responseContent);
+}
+
+void WebInterface::HandleEDelete()
+{
+	for (int i = 0; i < _myServer->args(); i++) {
+
+		Serial.print("Arg nº" + (String)i + " –> ");   //Include the current iteration value
+		Serial.print(_myServer->argName(i) + ": ");     //Get the name of the parameter
+		Serial.println(_myServer->arg(i));              //Get the value of the parameter
+
+	}
+	String a = _myServer->arg("no");
+	Serial.println((String)"no :" + a);
+	if (a != "")
+	{
+		int no = atoi(a.c_str());
+		if (no < N_DIPSWITCHES)
+		{
+			Serial.println(no);
+			estore->dipSwitchDelete(no);
+		}
+	}
+	_myServer->send(200, "");
+}
+
+
+void WebInterface::HandleEStore()
+{
+	typedef struct dipswitches_struct dipswitch;
+	dipswitch dp;
+	String a = _myServer->arg("name");
+	String b = _myServer->arg("house");
+	String c = _myServer->arg("code");
+	String c2 = _myServer->arg("tri1");
+	String c3 = _myServer->arg("tri2");
+	String d1 = _myServer->arg("url1");
+	String d2 = _myServer->arg("url2");
+	Serial.println("storing");
+	Serial.println(a);
+	Serial.println(b);
+	Serial.println(c);
+	Serial.println(c2);
+	Serial.println(c3);
+	Serial.println(d1);
+	Serial.println(d2);
+
+	int no = estore->dipSwitchFindFree();
+	if (no >= 0 && _myServer->method() == HTTP_POST)
+	{
+		memcpy(dp.name, (char *)a.c_str(), sizeof(dp.name));
+		memcpy(dp.housecode, (char *)b.c_str(), sizeof(dp.housecode));
+		memcpy(dp.code, (char *)c.c_str(), sizeof(dp.code));
+		//memcpy(dp.roomname, (char *)d.c_str(), sizeof(dp.roomname));
+		memcpy(dp.tri1, (char*)c2.c_str(), sizeof(dp.tri1));
+		memcpy(dp.tri2, (char *)c3.c_str(), sizeof(dp.tri2));
+		memcpy(dp.urlOn, (char *)d1.c_str(), sizeof(dp.urlOn));
+		memcpy(dp.urlOff, (char *)d2.c_str(), sizeof(dp.urlOff));
+		dp.name[sizeof(dp.name) - 1] = 0;
+		dp.housecode[sizeof(dp.housecode) - 1] = 0;
+		dp.code[sizeof(dp.code) - 1] = 0;
+		dp.tri1[sizeof(dp.tri1) - 1] = 0;
+		dp.tri2[sizeof(dp.tri2) - 1] = 0;
+		dp.urlOff[sizeof(dp.urlOff) - 1] = 0;
+		dp.urlOn[sizeof(dp.urlOn) - 1] = 0;
+		estore->dipSwitchSave(no, &dp);
+	}
+
+	_myServer->send(200, "");
+
+}
+
 void WebInterface::HandleSetupRoot()
 {
 	char setupoutputbuffer[sizeof(HTML_HEADER_SETUP) + sizeof(HTML_SSID) + 5];

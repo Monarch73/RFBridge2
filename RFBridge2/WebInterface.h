@@ -26,6 +26,9 @@ public:
 	static void HandleAngular(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
 	static void SetDevices(RCSwitch *mySwitch, ESP8266WebServer *myServer);
 	static void ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
+	static void HandleJsonList();
+	static void HandleEStore();
+	static void HandleEDelete();
 
 private:
 	static RCSwitch* _mySwitch;

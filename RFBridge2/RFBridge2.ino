@@ -95,6 +95,14 @@ void setup() {
 	on(WebInterface::HandleAngular, "inline.6022114626152249fbb3.bundle.js", HTTP_ANY);
 	on(WebInterface::HandleAngular, "polyfills.5b59249e2a37b3779465.bundle.js", HTTP_ANY);
 	on(WebInterface::HandleAngular, "main.e8c6b586049960613364.bundle.js", HTTP_ANY);
+	server->on("/jsonList", HTTP_GET, WebInterface::HandleJsonList );
+	server->on("/estore", HTTP_POST , WebInterface::HandleEStore);
+	server->on("/edelete", HTTP_GET, WebInterface::HandleEDelete);
+
+	const char * headerkeys[] = { "User-Agent","Cookie", "If-Modified-Since" };
+	size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
+	//ask server to track these headers
+	server->collectHeaders(headerkeys, headerkeyssize);
 
 	server->begin();
 	ArduinoOTA.onStart([]() {
@@ -115,6 +123,7 @@ void setup() {
 		else if (error == OTA_END_ERROR) Serial.println("End Failed");
 	});
 	ArduinoOTA.begin();
+
 	Serial.println("Hue Emulation startet: " + WiFi.localIP().toString());
 
 	otaEnabled = true;
