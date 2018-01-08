@@ -9,7 +9,7 @@
 #include "WcFnRequestHandler.h"
 #include "WebInterface.h"
 #include "EStore.h"
-#include "SSDP.h"
+//#include "SSDP.h"
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <RCSwitch.h>

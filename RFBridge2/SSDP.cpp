@@ -26,10 +26,20 @@ THE SOFTWARE.
 
 */
 // #define LWIP_OPEN_SRC
+#ifndef LWIP_OPEN_SRC
+#define LWIP_OPEN_SRC
+#endif
+
 #include <functional>
 #include "SSDP.h"
-#include "WiFiUdp.h"
-#include "debug.h"
+#include <WiFiUdp.h>
+
+#include <functional>
+#include <WiFiUdp.h>
+#include "ArduinoOTA.h"
+#include "MD5Builder.h"
+#include "StreamString.h"
+
 
 extern "C" {
 #include "osapi.h"
@@ -43,6 +53,7 @@ extern "C" {
 #include "lwip/igmp.h"
 #include "lwip/mem.h"
 #include "include/UdpContext.h"
+
 
 //#define DEBUG_SSDP  Serial
 
@@ -199,7 +210,7 @@ bool SSDPClass::begin() {
 
 void SSDPClass::_send(ssdp_method_t method) {
 	char buffer[1460];
-	uint32_t ip = WiFi.localIP();
+	IPAddress ip = WiFi.localIP();
 
 	int len;
 	if (_messageFormatCallback) {
@@ -214,7 +225,7 @@ void SSDPClass::_send(ssdp_method_t method) {
 			_uuid,
 			(method == NONE) ? "ST" : "NT",
 			_deviceType,
-			IP2STR(&ip), _port, _schemaURL
+			ip.toString().c_str(), _port, _schemaURL
 		);
 	}
 
@@ -246,9 +257,9 @@ void SSDPClass::_send(ssdp_method_t method) {
 }
 
 void SSDPClass::schema(WiFiClient client) {
-	uint32_t ip = WiFi.localIP();
+	IPAddress ip = WiFi.localIP();
 	client.printf(_ssdp_schema_template,
-		IP2STR(&ip), _port,
+		ip.toString().c_str(), _port,
 		_deviceType,
 		_friendlyName,
 		_presentationURL,
