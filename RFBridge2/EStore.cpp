@@ -15,7 +15,7 @@ extern "C" {
 
 #define USE_SPIFFS	1
 
-typedef struct dipswitches_struct dipswitch;
+//typedef struct dipswitches_struct dipswitch;
 char EStore::ssid[N_CHAR_SSID];
 char EStore::password[N_CHAR_PASSWORD];
 

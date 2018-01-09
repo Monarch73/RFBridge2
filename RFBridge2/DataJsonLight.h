@@ -31,6 +31,7 @@ public:
 	char *name;
 	bool state;
 
+
 	void ToOutput(char*buffer, size_t len) override
 	{
 		StaticJsonBuffer<400> jsonBuffer;

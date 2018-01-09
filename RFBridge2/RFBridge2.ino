@@ -90,6 +90,10 @@ void setup() {
 	server = new ESP8266WebServer(80);
 	WebInterface::SetDevices(&mySwitch, server);
 	on(WebInterface::ConfigFn, "/api/*/config", HTTP_ANY);
+	on(WebInterface::LightFn, "/api/*/lights/*", HTTP_ANY);
+	on(WebInterface::LightControlFn, "/api/*/lights/*/state", HTTP_ANY);
+	on(WebInterface::LightsFn, "/api/*/lights", HTTP_ANY);
+
 	on(WebInterface::HandleAngular,"/", HTTP_ANY);
 	on(WebInterface::HandleAngular, "styles.89c7d201f868ab33b8ed.bundle.css", HTTP_ANY);
 	on(WebInterface::HandleAngular, "inline.6022114626152249fbb3.bundle.js", HTTP_ANY);

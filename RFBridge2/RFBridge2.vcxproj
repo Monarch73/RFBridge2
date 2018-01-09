@@ -86,6 +86,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DataJsonConfig.h" />
+    <ClInclude Include="DataJsonInterface.h" />
+    <ClInclude Include="DataJsonLight.h" />
     <ClInclude Include="DipSwitches.h" />
     <ClInclude Include="EStore.h" />
     <ClInclude Include="SSDP.h" />

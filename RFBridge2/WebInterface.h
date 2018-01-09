@@ -26,6 +26,10 @@ public:
 	static void HandleAngular(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
 	static void SetDevices(RCSwitch *mySwitch, ESP8266WebServer *myServer);
 	static void ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
+	static void WholeConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
+	static void LightFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
+	static void LightsFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
+	static void LightControlFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
 	static void HandleJsonList();
 	static void HandleEStore();
 	static void HandleEDelete();
@@ -35,7 +39,6 @@ private:
 	static ESP8266WebServer* _myServer;
 	static char *_hueId;
 	static void SendJson(DataJsonInterface* data);
-	
 };
 
 #endif

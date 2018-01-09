@@ -5,6 +5,8 @@
 #include "WebInterface.h"
 #include <ArduinoJson.h>
 #include "DataJsonConfig.h"
+#include "DataJsonLight.h"
+#include "DipSwitches.h"
 
 char HTML_HEADER[] PROGMEM = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>RFBridge</title><link rel=\"stylesheet/less\" type=\"text/css\" href=\"http://www.monarch.de/c64-theme/css/style.css\" />"
 "<script src=\"http://www.monarch.de/c64-theme/js/less-1.3.0.min.js\" type=\"text/javascript\"></script><script>function changeFont(font) {document.getElementById('font-div').className = font; }"
@@ -39,6 +41,7 @@ EStore *WebInterface::estore;
 RCSwitch *WebInterface::_mySwitch;
 ESP8266WebServer* WebInterface::_myServer;
 char * WebInterface::_hueId;
+bool lightStates[N_DIPSWITCHES];
 
 void WebInterface::HandleAngular(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
 {
@@ -75,11 +78,105 @@ void WebInterface::HandleAngular(WcFnRequestHandler *handler, String requestUri,
 	}
 }
 
+
+void WebInterface::LightsFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
+	typedef struct dipswitches_struct dipswitch;
+	dipswitch dp;
+	const int memorySize = 2048;
+	char *responseContent = (char*)malloc(memorySize);
+	strcpy(responseContent, "{");
+	int currentLight = 1;
+	for (int i = 0; i < N_DIPSWITCHES; i++)
+	{
+		WebInterface::estore->dipSwitchLoad(i, &dp);
+		if (dp.name[0] != 0)
+		{
+			const int memorySingleLightSize = 512;
+
+			if (currentLight != 1)
+			{
+				strcat(responseContent, ",");
+			}
+			char *json = (char *)malloc(memorySingleLightSize);
+			DataJsonLight *objLight = new DataJsonLight();
+			String unique = WiFi.macAddress();
+			unique.toLowerCase();
+			unique += "-" + String(currentLight);
+			objLight->name = dp.name;
+			objLight->state = lightStates[i];
+			objLight->uniqueID = strdup(unique.c_str());
+			objLight->ToOutput(json, memorySize);
+			free(objLight->uniqueID);
+			strcat(responseContent, "\"");
+			strcat(responseContent, String(currentLight).c_str());
+			strcat(responseContent, "\":{");
+			strcat(responseContent, json);
+			strcat(responseContent, "}");
+			currentLight++;
+		}
+	}
+
+	strcat(responseContent,"}");
+	_myServer->send(200, "application/json", responseContent);
+	free(responseContent);
+}
+
+void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
+	typedef struct dipswitches_struct dipswitch;
+	dipswitch dp;
+	const int memorySize = 512;
+	char *responseContent = (char*)malloc(memorySize);
+	int numberOfTheLight = atoi(handler->getWildCard(1).c_str()) - 1;
+	int currentLight = 0;
+	for (int i = 0; i < N_DIPSWITCHES; i++)
+	{
+		WebInterface::estore->dipSwitchLoad(i, &dp);
+		if (dp.name[0] != 0)
+		{
+			if (currentLight == numberOfTheLight)
+			{
+			}
+		}
+	}
+}
+
+void WebInterface::LightFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
+	typedef struct dipswitches_struct dipswitch;
+	dipswitch dp;
+	const int memorySize = 512;
+	char *responseContent = (char*)malloc(memorySize);
+	int numberOfTheLight = atoi(handler->getWildCard(1).c_str()) - 1;
+	int currentLight = 0;
+	for (int i = 0; i < N_DIPSWITCHES; i++)
+	{
+		WebInterface::estore->dipSwitchLoad(i, &dp);
+		if (dp.name[0] != 0)
+		{
+			if (currentLight == numberOfTheLight)
+			{
+				DataJsonLight *objLight = new DataJsonLight();
+				String unique = WiFi.macAddress();
+				unique.toLowerCase();
+				unique += "-" + String(currentLight + 1);
+				objLight->name = dp.name;
+				objLight->state = lightStates[i];
+				objLight->uniqueID = strdup(unique.c_str());
+				objLight->ToOutput(responseContent, memorySize);
+				free(objLight->uniqueID);
+			}
+			currentLight++;
+		}
+	}
+	_myServer->send(200, "application/json", responseContent);
+	free(responseContent);
+}
+
+
 void WebInterface::HandleJsonList()
 {
 	typedef struct dipswitches_struct dipswitch;
 	dipswitch dp;
-	char *responseContent = (char*)malloc(4096);
+	char *responseContent = (char*)malloc(1024);
 	if (responseContent == NULL)
 	{
 		Serial.println("out of memory");
@@ -237,6 +334,10 @@ void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server)
 	mac.replace(":", "");
 	mac = mac.substring(0, 6) + "FFFE" + mac.substring(6);
 	_hueId = strdup(mac.c_str());
+
+}
+
+void WebInterface::WholeConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
 
 }
 
