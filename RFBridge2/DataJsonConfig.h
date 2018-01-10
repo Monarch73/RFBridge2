@@ -24,27 +24,34 @@
 class DataJsonConfig : public DataJsonInterface
 {
 
+private:
+	char *_bridgeId;
+	String _mac;
+	String _iPAdress;
+
 public:
-	char *bridgeId;
-	char *mac;
-	char *iPAdress;
-
-	DataJsonConfig() {	}
-
-	void ToOutput (char *buffer, size_t len) override 
+	DataJsonConfig(char *bridgeId, const String& mac, const String& ipAdress) :
+		_bridgeId(bridgeId),
+		_mac(mac),
+		_iPAdress ( ipAdress)
 	{
+	}
+
+	String ToOutput () override 
+	{
+		String result;
 		StaticJsonBuffer<500> jsonBuffer;
 
 		JsonObject& root = jsonBuffer.createObject();
 		root["name"] = "hue emulator";
 		root["swversion"] = "81012917";
-		root["bridgeid"] = bridgeId;
+		root["bridgeid"] = _bridgeId;
 		root["portalservices"] = (bool)false;
 
 		root["linkbutton"] = (bool)false;
-		root["mac"] = mac;
+		root["mac"] = _mac;
 		root["dhcp"] = (bool)true;
-		root["ipaddress"] = iPAdress;
+		root["ipaddress"] = _iPAdress;
 		root["netmask"] = "255.255.255.0";
 		root["gateway"] = "192.168.1.1";
 		root["apiversion"] = "1.3.0";
@@ -54,9 +61,9 @@ public:
 		root["whitelist"] = RawJson("{\"api\":{\"name\":\"clientname#devicename\"}}");
 		root["swupdate"] = RawJson("{\"text\":\"\", \"notify\" : false, \"updatestate\" : 0, \"url\" : \"\"}");
 
-		root.printTo(buffer, len);
+		root.printTo(result);
 		
-		return ;
+		return result;
 	}
 
 

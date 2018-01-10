@@ -5,5 +5,5 @@
 class DataJsonInterface
 {
 public:
-	virtual void ToOutput(char*buffer, size_t len) { return; }
+	virtual String ToOutput() { return ""; }
 };

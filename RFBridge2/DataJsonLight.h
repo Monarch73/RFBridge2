@@ -26,19 +26,33 @@
 
 class DataJsonLight : public DataJsonInterface
 {
+private:
+	int _lightId;
+	char *_name;
+	bool _state;
+
 public:
-	char *uniqueID;
-	char *name;
-	bool state;
-
-
-	void ToOutput(char*buffer, size_t len) override
+	DataJsonLight(int lightId, char *name, bool state ) :
+		_lightId(lightId),
+		_name(name),
+		_state(state)
 	{
+
+	}
+
+	String ToOutput() override
+	{
+		String retunValue;
 		StaticJsonBuffer<400> jsonBuffer;
 		JsonObject& root = jsonBuffer.createObject();
+
+		String unique = WiFi.macAddress();
+		unique.toLowerCase();
+		unique += "-" + String(_lightId);
+
 		root["manufacturername"] = "OpenSource";
 		root["modelid"] = "LST001";
-		root["name"] = name;
+		root["name"] = _name;
 		JsonObject& state = root.createNestedObject("state");
 		state["on"] = state;
 		state["hue"] = 0;
@@ -52,9 +66,9 @@ public:
 		state["reachable"] = (bool)true;
 		root["swversion"] = "0.1";
 		root["type"] = "Dimmable light";
-		root["uniqueid"] = uniqueID;
+		root["uniqueid"] = unique;
 
-		root.printTo(buffer, len);
-		return;
+		root.printTo(retunValue);
+		return retunValue;
 	}
 };

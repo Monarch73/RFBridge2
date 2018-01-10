@@ -82,50 +82,36 @@ void WebInterface::HandleAngular(WcFnRequestHandler *handler, String requestUri,
 void WebInterface::LightsFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
 	typedef struct dipswitches_struct dipswitch;
 	dipswitch dp;
-	const int memorySize = 2048;
-	char *responseContent = (char*)malloc(memorySize);
-	strcpy(responseContent, "{");
+	String responseContent = "{";
 	int currentLight = 1;
 	for (int i = 0; i < N_DIPSWITCHES; i++)
 	{
 		WebInterface::estore->dipSwitchLoad(i, &dp);
 		if (dp.name[0] != 0)
 		{
-			const int memorySingleLightSize = 512;
-
 			if (currentLight != 1)
 			{
-				strcat(responseContent, ",");
+				responseContent+= ",";
 			}
-			char *json = (char *)malloc(memorySingleLightSize);
-			DataJsonLight *objLight = new DataJsonLight();
-			String unique = WiFi.macAddress();
-			unique.toLowerCase();
-			unique += "-" + String(currentLight);
-			objLight->name = dp.name;
-			objLight->state = lightStates[i];
-			objLight->uniqueID = strdup(unique.c_str());
-			objLight->ToOutput(json, memorySize);
-			free(objLight->uniqueID);
-			strcat(responseContent, "\"");
-			strcat(responseContent, String(currentLight).c_str());
-			strcat(responseContent, "\":{");
-			strcat(responseContent, json);
-			strcat(responseContent, "}");
+			DataJsonLight *objLight = new DataJsonLight(i+1, dp.name, lightStates[i]);
+			String light=objLight->ToOutput();
+			responseContent+="\"";
+			responseContent+= String(currentLight);
+			responseContent+= "\":{";
+			responseContent+=light;
+			responseContent+= "}";
 			currentLight++;
 		}
 	}
 
-	strcat(responseContent,"}");
+	responseContent+="}";
 	_myServer->send(200, "application/json", responseContent);
-	free(responseContent);
 }
 
-void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
+void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
+{
 	typedef struct dipswitches_struct dipswitch;
 	dipswitch dp;
-	const int memorySize = 512;
-	char *responseContent = (char*)malloc(memorySize);
 	int numberOfTheLight = atoi(handler->getWildCard(1).c_str()) - 1;
 	int currentLight = 0;
 	for (int i = 0; i < N_DIPSWITCHES; i++)
@@ -140,13 +126,13 @@ void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri
 	}
 }
 
-void WebInterface::LightFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
+void WebInterface::LightFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
+{
 	typedef struct dipswitches_struct dipswitch;
 	dipswitch dp;
-	const int memorySize = 512;
-	char *responseContent = (char*)malloc(memorySize);
 	int numberOfTheLight = atoi(handler->getWildCard(1).c_str()) - 1;
 	int currentLight = 0;
+	String response;
 	for (int i = 0; i < N_DIPSWITCHES; i++)
 	{
 		WebInterface::estore->dipSwitchLoad(i, &dp);
@@ -154,21 +140,13 @@ void WebInterface::LightFn(WcFnRequestHandler *handler, String requestUri, HTTPM
 		{
 			if (currentLight == numberOfTheLight)
 			{
-				DataJsonLight *objLight = new DataJsonLight();
-				String unique = WiFi.macAddress();
-				unique.toLowerCase();
-				unique += "-" + String(currentLight + 1);
-				objLight->name = dp.name;
-				objLight->state = lightStates[i];
-				objLight->uniqueID = strdup(unique.c_str());
-				objLight->ToOutput(responseContent, memorySize);
-				free(objLight->uniqueID);
+				DataJsonLight *objLight = new DataJsonLight(i+1, dp.name, lightStates[i]);
+				response = objLight->ToOutput();
 			}
 			currentLight++;
 		}
 	}
-	_myServer->send(200, "application/json", responseContent);
-	free(responseContent);
+	_myServer->send(200, "application/json", response);
 }
 
 
@@ -265,7 +243,6 @@ void WebInterface::HandleEStore()
 		memcpy(dp.name, (char *)a.c_str(), sizeof(dp.name));
 		memcpy(dp.housecode, (char *)b.c_str(), sizeof(dp.housecode));
 		memcpy(dp.code, (char *)c.c_str(), sizeof(dp.code));
-		//memcpy(dp.roomname, (char *)d.c_str(), sizeof(dp.roomname));
 		memcpy(dp.tri1, (char*)c2.c_str(), sizeof(dp.tri1));
 		memcpy(dp.tri2, (char *)c3.c_str(), sizeof(dp.tri2));
 		memcpy(dp.urlOn, (char *)d1.c_str(), sizeof(dp.urlOn));
@@ -312,7 +289,7 @@ void WebInterface::handleSetupSSID()
 
 	strcpy_P(setupoutputbuffer, HTML_HEADER_SETUP);
 	strcat_P(setupoutputbuffer, HTML_SSIDOK);
-	_myServer->send(200, "text / plain", setupoutputbuffer);
+	_myServer->send(200, "text/plain", setupoutputbuffer);
 }
 
 void WebInterface::HandleFormat()
@@ -344,13 +321,8 @@ void WebInterface::WholeConfigFn(WcFnRequestHandler *handler, String requestUri,
 void WebInterface::ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
 	switch (method) {
 	case HTTP_GET: {
-		DataJsonConfig *jsonConfig = new DataJsonConfig();
-		jsonConfig->bridgeId = _hueId;
-		jsonConfig->iPAdress = (char *)strdup(WiFi.localIP().toString().c_str());
-		jsonConfig->mac = (char *)strdup(WiFi.macAddress().c_str());
+		DataJsonConfig *jsonConfig = new DataJsonConfig(_hueId, WiFi.macAddress(), WiFi.localIP().toString());
 		SendJson(jsonConfig);
-		free(jsonConfig->mac);
-		free(jsonConfig->iPAdress);
 		break;
 	}
 	case HTTP_PUT: {
@@ -362,9 +334,9 @@ void WebInterface::ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTP
 	}
 }
 
-void WebInterface::SendJson(DataJsonInterface * data)
+void WebInterface::SendJson(DataJsonInterface *json)
 {
-	char outputBuffer[1024];
-	data->ToOutput((char*)&outputBuffer, 1024);
-	_myServer->send(200, "application/json", outputBuffer);
+	String response = json->ToOutput();
+	_myServer->sendHeader("Access-Control-Allow-Origin", "*");
+	_myServer->send(200, "application/json", response);
 }
