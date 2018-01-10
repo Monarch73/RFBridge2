@@ -45,16 +45,14 @@ public:
 		String retunValue;
 		StaticJsonBuffer<400> jsonBuffer;
 		JsonObject& root = jsonBuffer.createObject();
-
 		String unique = WiFi.macAddress();
 		unique.toLowerCase();
 		unique += "-" + String(_lightId);
-
 		root["manufacturername"] = "OpenSource";
 		root["modelid"] = "LST001";
 		root["name"] = _name;
 		JsonObject& state = root.createNestedObject("state");
-		state["on"] = state;
+		state["on"] = _state;
 		state["hue"] = 0;
 		state["bri"] = 0;
 		state["sat"] = 0;
@@ -67,7 +65,6 @@ public:
 		root["swversion"] = "0.1";
 		root["type"] = "Dimmable light";
 		root["uniqueid"] = unique;
-
 		root.printTo(retunValue);
 		return retunValue;
 	}
