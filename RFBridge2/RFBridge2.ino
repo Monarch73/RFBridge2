@@ -93,7 +93,7 @@ void setup() {
 	on(WebInterface::LightFn, "/api/*/lights/*", HTTP_ANY);
 	on(WebInterface::LightControlFn, "/api/*/lights/*/state", HTTP_ANY);
 	on(WebInterface::LightsFn, "/api/*/lights", HTTP_ANY);
-
+	on(WebInterface::WholeConfigFn, "/api", HTTP_ANY);
 	on(WebInterface::HandleAngular,"/", HTTP_ANY);
 	on(WebInterface::HandleAngular, "styles.89c7d201f868ab33b8ed.bundle.css", HTTP_ANY);
 	on(WebInterface::HandleAngular, "inline.6022114626152249fbb3.bundle.js", HTTP_ANY);

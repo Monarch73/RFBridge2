@@ -78,10 +78,41 @@ void WebInterface::HandleAngular(WcFnRequestHandler *handler, String requestUri,
 	}
 }
 
+void WebInterface::WholeConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method)
+{
+	String lightsList = GetLightsList();
+	DataJsonConfig *jsonConfig = new DataJsonConfig(_hueId, WiFi.macAddress(), WiFi.localIP().toString());
+	String config = jsonConfig->ToOutput();
+	lightsList.remove(lightsList.length() - 1);
 
-void WebInterface::LightsFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
+	lightsList += ",\"groups\": { },";
+
+	lightsList += "\"config\": " + config + ", \"schedules\": { }, \"scenes\": { }, \"rules\": { }, \"sensors\": { }, \"resoucelinks\": { } }";
+
+	_myServer->send(200, "application/json", lightsList);
+}
+
+void WebInterface::ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
+	switch (method) {
+	case HTTP_GET: {
+		DataJsonConfig *jsonConfig = new DataJsonConfig(_hueId, WiFi.macAddress(), WiFi.localIP().toString());
+		SendJson(jsonConfig);
+		break;
+	}
+	case HTTP_PUT: {
+		// TODO: actually store this
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+String WebInterface::GetLightsList()
+{
 	typedef struct dipswitches_struct dipswitch;
 	dipswitch dp;
+
 	String responseContent = "{";
 	int currentLight = 1;
 	for (int i = 0; i < N_DIPSWITCHES; i++)
@@ -91,21 +122,25 @@ void WebInterface::LightsFn(WcFnRequestHandler *handler, String requestUri, HTTP
 		{
 			if (currentLight != 1)
 			{
-				responseContent+= ",";
+				responseContent += ",";
 			}
-			DataJsonLight *objLight = new DataJsonLight(i+1, dp.name, lightStates[i]);
-			String light=objLight->ToOutput();
-			responseContent+="\"";
-			responseContent+= String(currentLight);
-			responseContent+= "\":{";
-			responseContent+=light;
-			responseContent+= "}";
+			DataJsonLight *objLight = new DataJsonLight(i + 1, dp.name, lightStates[i]);
+			String light = objLight->ToOutput();
+			responseContent += "\"";
+			responseContent += String(currentLight);
+			responseContent += "\":{";
+			responseContent += light;
+			responseContent += "}";
 			currentLight++;
 		}
 	}
 
-	responseContent+="}";
-	_myServer->send(200, "application/json", responseContent);
+	responseContent += "}";
+	return responseContent;
+}
+void WebInterface::LightsFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
+{
+	_myServer->send(200, "application/json", GetLightsList());
 }
 
 void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
@@ -314,25 +349,6 @@ void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server)
 
 }
 
-void WebInterface::WholeConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
-
-}
-
-void WebInterface::ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
-	switch (method) {
-	case HTTP_GET: {
-		DataJsonConfig *jsonConfig = new DataJsonConfig(_hueId, WiFi.macAddress(), WiFi.localIP().toString());
-		SendJson(jsonConfig);
-		break;
-	}
-	case HTTP_PUT: {
-		// TODO: actually store this
-		break;
-	}
-	default:
-		break;
-	}
-}
 
 void WebInterface::SendJson(DataJsonInterface *json)
 {

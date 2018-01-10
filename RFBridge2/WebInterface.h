@@ -39,6 +39,7 @@ private:
 	static ESP8266WebServer* _myServer;
 	static char *_hueId;
 	static void SendJson(DataJsonInterface *);
+	static String GetLightsList();
 };
 
 #endif
