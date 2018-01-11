@@ -69,66 +69,13 @@ static const IPAddress SSDP_MULTICAST_ADDR(239, 255, 255, 250);
 
 static const char* _ssdp_response_template =
 "HTTP/1.1 200 OK\r\n"
+"HOST: 239.255.255.250:1900\r\n"
 "EXT:\r\n";
 
 static const char* _ssdp_notify_template =
 "NOTIFY * HTTP/1.1\r\n"
 "HOST: 239.255.255.250:1900\r\n"
 "NTS: ssdp:alive\r\n";
-
-static const char* _ssdp_packet_template =
-"%s" // _ssdp_response_template / _ssdp_notify_template
-"CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
-"SERVER: FreeRTOS/6.0.5, UPnP/1.0, %s/%s\r\n" // _modelName, _modelNumber
-"USN: uuid:%s\r\n" // _uuid
-"%s: %s\r\n"  // "NT" or "ST", _deviceType
-"LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
-"\r\n";
-
-static const char* _ssdp_schema_template =
-"HTTP/1.1 200 OK\r\n"
-"Content-Type: text/xml\r\n"
-"Connection: close\r\n"
-"Access-Control-Allow-Origin: *\r\n"
-"\r\n"
-"<?xml version=\"1.0\"?>"
-"<root xmlns=\"urn:schemas-upnp-org:device-1-0\">"
-"<specVersion>"
-"<major>1</major>"
-"<minor>0</minor>"
-"</specVersion>"
-"<URLBase>http://%u.%u.%u.%u:%u/</URLBase>" // WiFi.localIP(), _port
-"<device>"
-"<deviceType>%s</deviceType>"
-"<friendlyName>%s</friendlyName>"
-"<presentationURL>%s</presentationURL>"
-"<serialNumber>%s</serialNumber>"
-"<modelName>%s</modelName>"
-"<modelNumber>%s</modelNumber>"
-"<modelURL>%s</modelURL>"
-"<manufacturer>%s</manufacturer>"
-"<manufacturerURL>%s</manufacturerURL>"
-"<UDN>uuid:%s</UDN>"
-"</device>"
-//    "<iconList>"
-//      "<icon>"
-//        "<mimetype>image/png</mimetype>"
-//        "<height>48</height>"
-//        "<width>48</width>"
-//        "<depth>24</depth>"
-//        "<url>icon48.png</url>"
-//      "</icon>"
-//      "<icon>"
-//       "<mimetype>image/png</mimetype>"
-//       "<height>120</height>"
-//       "<width>120</width>"
-//       "<depth>24</depth>"
-//       "<url>icon120.png</url>"
-//      "</icon>"
-//    "</iconList>"
-"</root>\r\n"
-"\r\n";
-
 
 struct SSDPTimer {
 	ETSTimer timer;
@@ -208,26 +155,29 @@ bool SSDPClass::begin() {
 	return true;
 }
 
+static const char* _ssdp_packet_template =
+"%s" // _ssdp_response_template / _ssdp_notify_template
+"CACHE-CONTROL: max-age=100\r\n" // SSDP_INTERVAL
+"LOCATION: http://%s:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
+"SERVER: Linux/3.14.0 UPnP/1.0 IpBridge/1.20.0\r\n"
+"hue-bridgeid: %s\r\n" //_bridgeId
+"%s: %s\r\n"  // "NT" or "ST", _deviceType
+"USN: uuid:%s::upnp:rootdevice\r\n" // _uuid
+"\r\n";
+
 void SSDPClass::_send(ssdp_method_t method) {
 	char buffer[1460];
-	IPAddress ip = WiFi.localIP();
-
+	
 	int len;
-	if (_messageFormatCallback) {
-		len = _messageFormatCallback(this, buffer, sizeof(buffer), method != NONE, SSDP_INTERVAL, _modelName, _modelNumber, _uuid, _deviceType, ip, _port, _schemaURL);
-	}
-	else {
 		len = snprintf(buffer, sizeof(buffer),
 			_ssdp_packet_template,
 			(method == NONE) ? _ssdp_response_template : _ssdp_notify_template,
-			SSDP_INTERVAL,
-			_modelName, _modelNumber,
-			_uuid,
+			_ip, _port, _schemaURL,
+			_bridgeId,
 			(method == NONE) ? "ST" : "NT",
 			_deviceType,
-			ip.toString().c_str(), _port, _schemaURL
+			_uuid
 		);
-	}
 
 	_server->append(buffer, len);
 
@@ -251,27 +201,29 @@ void SSDPClass::_send(ssdp_method_t method) {
 	DEBUG_SSDP.print(IPAddress(remoteAddr.addr));
 	DEBUG_SSDP.print(":");
 	DEBUG_SSDP.println(remotePort);
+	Serial.println(buffer);
+
 #endif
 
 	_server->send(&remoteAddr, remotePort);
 }
 
-void SSDPClass::schema(WiFiClient client) {
-	IPAddress ip = WiFi.localIP();
-	client.printf(_ssdp_schema_template,
-		ip.toString().c_str(), _port,
-		_deviceType,
-		_friendlyName,
-		_presentationURL,
-		_serialNumber,
-		_modelName,
-		_modelNumber,
-		_modelURL,
-		_manufacturer,
-		_manufacturerURL,
-		_uuid
-	);
-}
+////void SSDPClass::schema(WiFiClient client) {
+////	IPAddress ip = WiFi.localIP();
+////	client.printf(_ssdp_schema_template,
+////		ip.toString().c_str(), _port,
+////		_deviceType,
+////		_friendlyName,
+////		_presentationURL,
+////		_serialNumber,
+////		_modelName,
+////		_modelNumber,
+////		_modelURL,
+////		_manufacturer,
+////		_manufacturerURL,
+////		_uuid
+////	);
+////}
 
 // writes the next token into token if token is not NULL
 // returns -1 on message end, otherwise returns
@@ -453,6 +405,16 @@ void SSDPClass::_update() {
 			_server->flush();
 	}
 
+}
+
+void SSDPClass::setBridgeId(const char *brideId)
+{
+	strlcpy(_bridgeId, brideId, sizeof(_bridgeId));
+}
+
+void SSDPClass::setIpAdress(const char *ip)
+{
+	strlcpy(_ip, ip, sizeof(_ip));
 }
 
 void SSDPClass::setSchemaURL(const char *url) {

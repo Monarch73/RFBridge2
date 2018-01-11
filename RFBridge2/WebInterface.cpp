@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include "DataJsonConfig.h"
 #include "DataJsonLight.h"
+#include "DataJsonSuccess.h"
 #include "DipSwitches.h"
 #include "Progmem.h"
 #include <pgmspace.h>
@@ -72,22 +73,32 @@ void WebInterface::HandleAngular(WcFnRequestHandler *handler, String requestUri,
 
 void WebInterface::WholeConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method)
 {
-	String lightsList = GetLightsList();
-	DataJsonConfig *jsonConfig = new DataJsonConfig(_hueId, WiFi.macAddress(), WiFi.localIP().toString());
-	String config = jsonConfig->ToOutput();
-
-	lightsList.remove(lightsList.length() - 1);
-	if (lightsList.length() > 2)
+	if (requestUri == "/api/" && method == HTTP_POST)
 	{
-		lightsList += ",";
+		DataJsonSuccess* success = new DataJsonSuccess("username","api");
+		_myServer->send(200, "application/json", success->ToOutput());
 	}
-	lightsList += "\"groups\": { },";
-	lightsList += "\"config\": " + config + ", \"schedules\": { }, \"scenes\": { }, \"rules\": { }, \"sensors\": { }, \"resoucelinks\": { } }";
+	else
+	{
 
-	_myServer->send(200, "application/json", lightsList);
+		String lightsList = GetLightsList();
+		DataJsonConfig *jsonConfig = new DataJsonConfig(_hueId, WiFi.macAddress(), WiFi.localIP().toString());
+		String config = jsonConfig->ToOutput();
+
+		lightsList.remove(lightsList.length() - 1);
+		if (lightsList.length() > 2)
+		{
+			lightsList += ",";
+		}
+		lightsList += "\"groups\": { },";
+		lightsList += "\"config\": " + config + ", \"schedules\": { }, \"scenes\": { }, \"rules\": { }, \"sensors\": { }, \"resoucelinks\": { } }";
+
+		_myServer->send(200, "application/json", lightsList);
+	}
 }
 
 void WebInterface::ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) {
+	Serial.println("Reply by Config");
 	switch (method) {
 	case HTTP_GET: {
 		DataJsonConfig *jsonConfig = new DataJsonConfig(_hueId, WiFi.macAddress(), WiFi.localIP().toString());
@@ -135,11 +146,14 @@ String WebInterface::GetLightsList()
 }
 void WebInterface::LightsFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
 {
+	Serial.println("Reply by LightsList");
 	_myServer->send(200, "application/json", GetLightsList());
 }
 
 void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
 {
+	Serial.println("Reply by Lightscontrol");
+
 	typedef struct dipswitches_struct dipswitch;
 	dipswitch dp;
 	int numberOfTheLight = atoi(handler->getWildCard(1).c_str()) - 1;
@@ -158,6 +172,8 @@ void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri
 
 void WebInterface::LightFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
 {
+	Serial.println("Reply by Light");
+
 	typedef struct dipswitches_struct dipswitch;
 	dipswitch dp;
 	int numberOfTheLight = atoi(handler->getWildCard(1).c_str()) - 1;
@@ -318,14 +334,11 @@ void WebInterface::HandleRoot()
 
 }
 
-void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server)
+void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server, const char *hueId)
 {
 	_mySwitch = rc;
 	_myServer = server;
-	String mac = WiFi.macAddress();
-	mac.replace(":", "");
-	mac = mac.substring(0, 6) + "FFFE" + mac.substring(6);
-	_hueId = strdup(mac.c_str());
+	_hueId = strdup(hueId);
 
 }
 

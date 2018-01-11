@@ -46,6 +46,8 @@ class UdpContext;
 #define SSDP_MODEL_VERSION_SIZE     32
 #define SSDP_MANUFACTURER_SIZE      64
 #define SSDP_MANUFACTURER_URL_SIZE  128
+#define SSDP_IP_SIZE				20
+#define SSDP_HUEBRI_ID				18
 
 typedef enum {
 	NONE,
@@ -62,13 +64,13 @@ public:
 	~SSDPClass();
 
 	bool begin();
-	typedef std::function<int(SSDPClass *ssdp, char *buffer, int buff_len,
-		bool isNotify, int interval, char *modelName,
-		char *modelNumber, char *uuid, char *deviceType,
-		uint32_t ip, uint16_t port, char *schemaURL)> MsgFormatFunction;
-	void setMessageFormatCallback(MsgFormatFunction callback) { _messageFormatCallback = callback; }
+	////typedef std::function<int(SSDPClass *ssdp, char *buffer, int buff_len,
+	////	bool isNotify, int interval, char *modelName,
+	////	char *modelNumber, char *uuid, char *deviceType,
+	////	char *ip, uint16_t port, char *schemaURL)> MsgFormatFunction;
+	////void setMessageFormatCallback(MsgFormatFunction callback) { _messageFormatCallback = callback; }
 
-	void schema(WiFiClient client);
+//	void schema(WiFiClient client);
 
 	void setDeviceType(const String& deviceType) { setDeviceType(deviceType.c_str()); }
 	void setDeviceType(const char *deviceType);
@@ -93,6 +95,8 @@ public:
 	void setManufacturerURL(const char *url);
 	void setHTTPPort(uint16_t port);
 	void setTTL(uint8_t ttl);
+	void setIpAdress(const char *ip);
+	void setBridgeId(const char *brideId);
 
 protected:
 	void _send(ssdp_method_t method);
@@ -127,7 +131,10 @@ protected:
 	char _modelName[SSDP_MODEL_NAME_SIZE];
 	char _modelURL[SSDP_MODEL_URL_SIZE];
 	char _modelNumber[SSDP_MODEL_VERSION_SIZE];
-	MsgFormatFunction _messageFormatCallback = nullptr;
+	char _ip[SSDP_IP_SIZE];
+	char _bridgeId[SSDP_HUEBRI_ID];
+
+//	MsgFormatFunction _messageFormatCallback = nullptr;
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SSDP)

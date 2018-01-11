@@ -24,7 +24,7 @@ public:
 	static void handleSetupSSID();
 	static void HandleRoot();
 	static void HandleAngular(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
-	static void SetDevices(RCSwitch *mySwitch, ESP8266WebServer *myServer);
+	static void SetDevices(RCSwitch *mySwitch, ESP8266WebServer *myServer, const char *hueId);
 	static void ConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
 	static void WholeConfigFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
 	static void LightFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method);
