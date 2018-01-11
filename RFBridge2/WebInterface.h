@@ -33,6 +33,7 @@ public:
 	static void HandleJsonList();
 	static void HandleEStore();
 	static void HandleEDelete();
+	static void HandleDescription();
 
 private:
 	static RCSwitch* _mySwitch;

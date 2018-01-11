@@ -8,12 +8,34 @@
 #include "DataJsonLight.h"
 #include "DipSwitches.h"
 #include "Progmem.h"
+#include <pgmspace.h>
 
 EStore *WebInterface::estore;
 RCSwitch *WebInterface::_mySwitch;
 ESP8266WebServer* WebInterface::_myServer;
 char * WebInterface::_hueId;
 bool lightStates[N_DIPSWITCHES];
+
+void WebInterface::HandleDescription()
+{
+	String response;
+	for (uint i = 0; i < strlen_P(description); i++)
+	{
+		char chr = pgm_read_byte(description + i);
+		response += chr;
+	}
+
+	String mac = WiFi.macAddress();
+	mac.toLowerCase();
+	String udn = "uuid:2f402f80-da50-11e1-9b23-" + mac;
+
+	response.replace("##URLBASE##", WiFi.localIP().toString());
+	mac.toUpperCase();
+	response.replace("##MAC##", mac);
+	response.replace("##UDN##", udn);
+	
+	_myServer->send(200, "application/xml", response);
+}
 
 void WebInterface::HandleAngular(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
 {

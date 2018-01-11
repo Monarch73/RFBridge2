@@ -2,6 +2,8 @@
 #ifndef PROGMEM_H
 #define PROGMEM_H
 
+#include <pgmspace.h>
+
 char HTML_HEADER[] PROGMEM = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>RFBridge</title><link rel=\"stylesheet/less\" type=\"text/css\" href=\"http://www.monarch.de/c64-theme/css/style.css\" />"
 "<script src=\"http://www.monarch.de/c64-theme/js/less-1.3.0.min.js\" type=\"text/javascript\"></script><script>function changeFont(font) {document.getElementById('font-div').className = font; }"
 "function changeFontSize(fontsize) { document.getElementById('font-size-div').className = fontsize; }</script><link rel=\"shortcut icon\" href=\"http://www.monarch.de/c64-theme/images/favicon.ico\">"
