@@ -4,3 +4,6 @@
 [submodule "libraries/ArduinoJson"]
 	path = libraries/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson.git
+[submodule "hardware/esp8266/esp8266"]
+	path = hardware/esp8266/esp8266
+	url = https://github.com/Monarch73/Arduino.git
