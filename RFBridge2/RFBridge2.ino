@@ -16,6 +16,8 @@
 #include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
 #include <assert.h>
+#include <ESP8266HTTPClient.h>
+
 
 ESP8266WebServer* server;
 RCSwitch mySwitch = RCSwitch();
@@ -165,9 +167,26 @@ void setup() {
 
 // the loop function runs over and over again until power down or reset
 void loop() {
+	volatile char *urlToCall2;
+
 	if (otaEnabled)
 	{
 		ArduinoOTA.handle();
 	}
 	server->handleClient();
+
+	if ((urlToCall2 = WebInterface::GetUrlToCall()) != NULL)
+	{
+		Serial.print("Calling ");
+		Serial.print((char *)urlToCall2);
+		HTTPClient http;
+		bool ret = http.begin((char *)urlToCall2);
+		Serial.println(ret);
+		int ret2 = http.GET();
+		Serial.print(" ");
+		Serial.println(ret2);
+		http.end();
+		WebInterface::SetUrlToCall(NULL);
+		free((void *)urlToCall2);
+	}
 }

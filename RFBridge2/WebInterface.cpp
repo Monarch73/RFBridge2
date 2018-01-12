@@ -10,12 +10,14 @@
 #include "DipSwitches.h"
 #include "Progmem.h"
 #include <pgmspace.h>
+#include "RemoteControl.h"
 
 EStore *WebInterface::estore;
 RCSwitch *WebInterface::_mySwitch;
 ESP8266WebServer* WebInterface::_myServer;
 char * WebInterface::_hueId;
 bool lightStates[N_DIPSWITCHES];
+volatile char *WebInterface::_urlToCall;
 
 void WebInterface::HandleDescription()
 {
@@ -36,6 +38,16 @@ void WebInterface::HandleDescription()
 	response.replace("##UDN##", udn);
 	
 	_myServer->send(200, "application/xml", response);
+}
+
+void WebInterface::SetUrlToCall(char * urlToCall)
+{
+	_urlToCall = urlToCall;
+}
+
+volatile char * WebInterface::GetUrlToCall() 
+{
+	return _urlToCall;
 }
 
 void WebInterface::HandleAngular(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
@@ -178,11 +190,13 @@ void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri
 					if (on == true)
 					{
 						Serial.println("turning light on");
+						RemoteControl::Send(&dp, true);
 						lightStates[i] = true;
 					}
 					else
 					{
 						Serial.println("turning light off");
+						RemoteControl::Send(&dp, false);
 						lightStates[i] = false;
 					}
 				}
@@ -363,7 +377,7 @@ void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server, const char
 	_mySwitch = rc;
 	_myServer = server;
 	_hueId = strdup(hueId);
-
+	RemoteControl::_Switch = rc;
 }
 
 

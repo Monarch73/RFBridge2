@@ -34,8 +34,11 @@ public:
 	static void HandleEStore();
 	static void HandleEDelete();
 	static void HandleDescription();
+	static void SetUrlToCall(char *urlToCall);
+	volatile static char *GetUrlToCall();
 
 private:
+	volatile static char *_urlToCall;
 	static RCSwitch* _mySwitch;
 	static ESP8266WebServer* _myServer;
 	static char *_hueId;
