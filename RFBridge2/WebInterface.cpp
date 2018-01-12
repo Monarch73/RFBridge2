@@ -160,28 +160,38 @@ void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri
 
 	Serial.println(numberOfTheLight);
 	int currentLight = 0;
-	String on = _myServer->arg("Plain");
-	Serial.println(on);
-	for (int i = 0; i < N_DIPSWITCHES; i++)
+	String onJson = _myServer->arg("plain");
+	StaticJsonBuffer<200> jsonBuffer;
+	JsonObject& root = jsonBuffer.parseObject(onJson);
+	if (root.success())
 	{
-		WebInterface::estore->dipSwitchLoad(i, &dp);
-		if (dp.name[0] != 0)
+		bool on = root["on"];
+		Serial.println(on);
+		for (int i = 0; i < N_DIPSWITCHES; i++)
 		{
-			if (currentLight == numberOfTheLight)
+			WebInterface::estore->dipSwitchLoad(i, &dp);
+			if (dp.name[0] != 0)
 			{
-				if (on == "true")
+				if (currentLight == numberOfTheLight)
 				{
-					Serial.println("turning light on");
-					lightStates[i] = true;
+
+					if (on == true)
+					{
+						Serial.println("turning light on");
+						lightStates[i] = true;
+					}
+					else
+					{
+						Serial.println("turning light off");
+						lightStates[i] = false;
+					}
 				}
-				else
-				{
-					Serial.println("turning light off");
-					lightStates[i] = false;
-				}
+
+				currentLight++;
 			}
 		}
 	}
+	WebInterface::LightFn(handler, requestUri, method);
 }
 
 void WebInterface::LightFn(WcFnRequestHandler *handler, String requestUri, HTTPMethod method) 
@@ -311,7 +321,7 @@ void WebInterface::HandleSetupRoot()
 	char setupoutputbuffer[sizeof(HTML_HEADER_SETUP) + sizeof(HTML_SSID) + 5];
 	strcpy_P(setupoutputbuffer, HTML_HEADER_SETUP);
 	strcat_P(setupoutputbuffer, HTML_SSID);
-	_myServer->send(200, "text/plain", setupoutputbuffer);
+	_myServer->send(200, "text/html", setupoutputbuffer);
 }
 
 void WebInterface::handleSetupSSID()
@@ -334,7 +344,7 @@ void WebInterface::handleSetupSSID()
 
 	strcpy_P(setupoutputbuffer, HTML_HEADER_SETUP);
 	strcat_P(setupoutputbuffer, HTML_SSIDOK);
-	_myServer->send(200, "text/plain", setupoutputbuffer);
+	_myServer->send(200, "text/html", setupoutputbuffer);
 }
 
 void WebInterface::HandleFormat()
