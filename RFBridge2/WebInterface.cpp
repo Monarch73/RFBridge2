@@ -157,7 +157,11 @@ void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri
 	typedef struct dipswitches_struct dipswitch;
 	dipswitch dp;
 	int numberOfTheLight = atoi(handler->getWildCard(1).c_str()) - 1;
+
+	Serial.println(numberOfTheLight);
 	int currentLight = 0;
+	String on = _myServer->arg("Plain");
+	Serial.println(on);
 	for (int i = 0; i < N_DIPSWITCHES; i++)
 	{
 		WebInterface::estore->dipSwitchLoad(i, &dp);
@@ -165,6 +169,16 @@ void WebInterface::LightControlFn(WcFnRequestHandler *handler, String requestUri
 		{
 			if (currentLight == numberOfTheLight)
 			{
+				if (on == "true")
+				{
+					Serial.println("turning light on");
+					lightStates[i] = true;
+				}
+				else
+				{
+					Serial.println("turning light off");
+					lightStates[i] = false;
+				}
 			}
 		}
 	}
