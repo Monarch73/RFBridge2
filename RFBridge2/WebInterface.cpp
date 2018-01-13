@@ -127,7 +127,7 @@ void WebInterface::WholeConfigFn(WcFnRequestHandler *handler, String requestUri,
 {
 	if (requestUri == "/api/" && method == HTTP_POST)
 	{
-		Serial.println("Replay by success POST");
+		Serial.println("Reply by success POST");
 		DataJsonSuccess* success = new DataJsonSuccess("username","api");
 		_myServer->send(200, "application/json", success->ToOutput());
 	}
@@ -408,11 +408,12 @@ void WebInterface::HandleFormat()
 	WebInterface::HandleSetupRoot();
 }
 
-void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server, const char *hueId)
+void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server, const char *hueId, IRsend* ir)
 {
 	_mySwitch = rc;
 	_myServer = server;
 	_hueId = strdup(hueId);
+	RemoteControl::_myIr = ir;
 	RemoteControl::_Switch = rc;
 }
 

@@ -11,6 +11,9 @@ struct dipswitches_struct
 	char tri2[16];
 	char urlOn[160];
 	char urlOff[160];
+	uint16_t irhz;
+	uint16_t irDataOn[40];
+	uint16_t irDataOff[40];
 };
 
 #endif

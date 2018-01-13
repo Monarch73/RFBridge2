@@ -115,7 +115,7 @@ bool SSDPClass::begin() {
 	String mac = WiFi.macAddress();
 	mac.replace(":", "");
 	mac.toLowerCase();
-	sprintf(_uuid, "38323636-4558-4dda-9188-%s", mac.c_str());
+	sprintf(_uuid, "2f402f80-da50-11e1-9b23-%s", mac.c_str());
 
 #ifdef DEBUG_SSDP
 	DEBUG_SSDP.printf("SSDP UUID: %s\r\n", (char *)_uuid);

@@ -3,6 +3,8 @@
 
 #include "DipSwitches.h"
 #include <RCSwitch.h>
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
 
 typedef struct dipswitches_struct dipswitch;
 
@@ -10,6 +12,7 @@ class RemoteControl
 {
 public:
 	static RCSwitch *_Switch;
+	static IRsend* _myIr;
 
 	static void Send(dipswitch* dp, bool onoff)
 	{
@@ -20,16 +23,21 @@ public:
 			{
 				RemoteControl::_Switch->sendTriState(dp->tri2);
 			}
+			else if (dp->irhz != 0)
+			{
+
+			}
 			else   if (strlen(dp->urlOff) > 2)
 			{
 				Serial.print("Off ");
 				Serial.println(dp->urlOff);
 				WebInterface::SetUrlToCall(strdup(dp->urlOff));
 			}
-			else
+			else 
 			{
 				RemoteControl::_Switch->switchOff(dp->housecode, dp->code);
 			}
+			
 		}
 		else
 		{
@@ -53,5 +61,6 @@ public:
 };
 
 RCSwitch *RemoteControl::_Switch;
+IRsend *RemoteControl::_myIr;
 
 #endif // REMOTECONTROL_H

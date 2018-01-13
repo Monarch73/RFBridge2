@@ -17,10 +17,13 @@
 #include <ArduinoOTA.h>
 #include <assert.h>
 #include <ESP8266HTTPClient.h>
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
 
 ESP8266WebServer* server;
 RCSwitch mySwitch = RCSwitch();
 bool otaEnabled = false;
+IRsend *myIr;
 
 typedef std::function<void(WcFnRequestHandler *, String, HTTPMethod)> HandlerFunction;
 
@@ -32,6 +35,8 @@ void on(HandlerFunction fn, const String &wcUri, HTTPMethod method, char wildcar
 void setup() {
 	Serial.begin(115200);
 	mySwitch.enableTransmit(2);
+	myIr = new IRsend(4);
+	
 	int zahl = analogRead(A0);
 	Serial.println(zahl);
 	String hueId = WiFi.macAddress();
@@ -59,7 +64,7 @@ void setup() {
 		Serial.print("AP IP address: ");
 		Serial.println(myIP);
 		server = new ESP8266WebServer(80);
-		WebInterface::SetDevices(&mySwitch, server, hueId.c_str());
+		WebInterface::SetDevices(&mySwitch, server, hueId.c_str(), myIr);
 		server->on("/", HTTP_GET, WebInterface::HandleSetupRoot);
 		server->on("/setup", HTTP_POST, WebInterface::handleSetupSSID);
 		server->begin();
@@ -80,7 +85,7 @@ void setup() {
 		Serial.print("AP IP address: ");
 		Serial.println(myIP);
 		server = new ESP8266WebServer(80);
-		WebInterface::SetDevices(&mySwitch, server,hueId.c_str());
+		WebInterface::SetDevices(&mySwitch, server,hueId.c_str(), myIr);
 		server->on("/", HTTP_GET, WebInterface::HandleSetupRoot);
 		server->on("/setup", HTTP_POST, WebInterface::handleSetupSSID);
 		server->begin();
@@ -93,7 +98,7 @@ void setup() {
 	}
 
 	server = new ESP8266WebServer(80);
-	WebInterface::SetDevices(&mySwitch, server, hueId.c_str());
+	WebInterface::SetDevices(&mySwitch, server, hueId.c_str(), myIr);
 	on(WebInterface::ConfigFn, "/api/*/config", HTTP_ANY);
 	on(WebInterface::LightFn, "/api/*/lights/*", HTTP_ANY);
 	on(WebInterface::LightControlFn, "/api/*/lights/*/state", HTTP_ANY);
@@ -103,9 +108,9 @@ void setup() {
 	on(WebInterface::WholeConfigFn, "/api/api", HTTP_ANY);
 	on(WebInterface::HandleAngular,"/", HTTP_ANY);
 	on(WebInterface::HandleAngular, "styles.89c7d201f868ab33b8ed.bundle.css", HTTP_ANY);
-	on(WebInterface::HandleAngular, "inline.6022114626152249fbb3.bundle.js", HTTP_ANY);
+	on(WebInterface::HandleAngular, "inline.f41fde31ea1a5cf9edc6.bundle.js", HTTP_ANY);
 	on(WebInterface::HandleAngular, "polyfills.5b59249e2a37b3779465.bundle.js", HTTP_ANY);
-	on(WebInterface::HandleAngular, "main.e8c6b586049960613364.bundle.js", HTTP_ANY);
+	on(WebInterface::HandleAngular, "main.703350806a72f38a4374.bundle.js", HTTP_ANY);
 	server->on("/description.xml", HTTP_GET, WebInterface::HandleDescription);
 	server->on("/jsonList", HTTP_GET, WebInterface::HandleJsonList );
 	server->on("/estore", HTTP_POST , WebInterface::HandleEStore);
