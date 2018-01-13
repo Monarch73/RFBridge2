@@ -367,11 +367,6 @@ void WebInterface::HandleFormat()
 	WebInterface::HandleSetupRoot();
 }
 
-void WebInterface::HandleRoot()
-{
-
-}
-
 void WebInterface::SetDevices(RCSwitch *rc, ESP8266WebServer *server, const char *hueId)
 {
 	_mySwitch = rc;
