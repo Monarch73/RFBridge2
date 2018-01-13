@@ -40,6 +40,46 @@ void WebInterface::HandleDescription()
 	_myServer->send(200, "application/xml", response);
 }
 
+void WebInterface::HandleESocket()
+{
+	typedef struct dipswitches_struct dipswitch;
+	dipswitch dp;
+
+	String argNO = _myServer->arg("no");
+	String argOnOff = _myServer->arg("sw");
+	if (argNO != "" && argOnOff!="")
+	{
+		int nummer = atoi(argNO.c_str());
+		int onoff = atoi(argOnOff.c_str());
+		int currentLight = 0;
+		for (int i = 0; i < N_DIPSWITCHES; i++)
+		{
+			WebInterface::estore->dipSwitchLoad(i, &dp);
+			if (dp.name[0] != 0)
+			{
+				if (currentLight == nummer)
+				{
+					if (onoff == 1)
+					{
+						Serial.println("turning light on");
+						RemoteControl::Send(&dp, true);
+						lightStates[i] = true;
+					}
+					else
+					{
+						Serial.println("turning light off");
+						RemoteControl::Send(&dp, false);
+						lightStates[i] = false;
+					}
+				}
+				currentLight++;
+			}
+		}
+	}
+
+	_myServer->send(200, "");
+}
+
 void WebInterface::SetUrlToCall(char * urlToCall)
 {
 	_urlToCall = urlToCall;
@@ -87,12 +127,13 @@ void WebInterface::WholeConfigFn(WcFnRequestHandler *handler, String requestUri,
 {
 	if (requestUri == "/api/" && method == HTTP_POST)
 	{
+		Serial.println("Replay by success POST");
 		DataJsonSuccess* success = new DataJsonSuccess("username","api");
 		_myServer->send(200, "application/json", success->ToOutput());
 	}
 	else
 	{
-
+		Serial.println("Reply by whole config");
 		String lightsList = GetLightsList();
 		DataJsonConfig *jsonConfig = new DataJsonConfig(_hueId, WiFi.macAddress(), WiFi.localIP().toString());
 		String config = jsonConfig->ToOutput();

@@ -112,7 +112,6 @@ SSDPClass::~SSDPClass() {
 bool SSDPClass::begin() {
 	_pending = false;
 
-	uint32_t chipId = ESP.getChipId();
 	String mac = WiFi.macAddress();
 	mac.replace(":", "");
 	mac.toLowerCase();

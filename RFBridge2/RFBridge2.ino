@@ -18,7 +18,6 @@
 #include <assert.h>
 #include <ESP8266HTTPClient.h>
 
-
 ESP8266WebServer* server;
 RCSwitch mySwitch = RCSwitch();
 bool otaEnabled = false;
@@ -101,7 +100,7 @@ void setup() {
 	on(WebInterface::LightsFn, "/api/*/lights", HTTP_ANY);
 	on(WebInterface::WholeConfigFn, "/api", HTTP_ANY);
 	on(WebInterface::WholeConfigFn, "/api/", HTTP_ANY);
-	on(WebInterface::ConfigFn, "/api/api", HTTP_ANY);
+	on(WebInterface::WholeConfigFn, "/api/api", HTTP_ANY);
 	on(WebInterface::HandleAngular,"/", HTTP_ANY);
 	on(WebInterface::HandleAngular, "styles.89c7d201f868ab33b8ed.bundle.css", HTTP_ANY);
 	on(WebInterface::HandleAngular, "inline.6022114626152249fbb3.bundle.js", HTTP_ANY);
@@ -111,6 +110,7 @@ void setup() {
 	server->on("/jsonList", HTTP_GET, WebInterface::HandleJsonList );
 	server->on("/estore", HTTP_POST , WebInterface::HandleEStore);
 	server->on("/edelete", HTTP_GET, WebInterface::HandleEDelete);
+	server->on("/esocket", HTTP_GET, WebInterface::HandleESocket);
 
 	const char * headerkeys[] = { "User-Agent","Cookie", "If-Modified-Since" };
 	size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);

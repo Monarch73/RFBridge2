@@ -33,6 +33,7 @@ public:
 	static void HandleEStore();
 	static void HandleEDelete();
 	static void HandleDescription();
+	static void HandleESocket();
 	static void SetUrlToCall(char *urlToCall);
 	volatile static char *GetUrlToCall();
 
