@@ -12,8 +12,8 @@ struct dipswitches_struct
 	char urlOn[160];
 	char urlOff[160];
 	uint16_t irhz;
-	uint16_t irDataOn[40];
-	uint16_t irDataOff[40];
+	uint16_t irDataOn[100];
+	uint16_t irDataOff[100];
 };
 
 #endif

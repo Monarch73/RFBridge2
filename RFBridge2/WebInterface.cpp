@@ -395,9 +395,9 @@ void WebInterface::ParseStringNumbers(String& data, uint16_t*numbers)
 	int currentNumber=0;
 	char *myData = (char *)data.c_str();
 	char *currentBlock = strtok(myData, ",");
-	while (currentBlock != NULL && currentNumber<(sizeof(dp.irDataOn)/sizeof(uint16_t))-1)
+	while (currentBlock != NULL && currentNumber<(int)((sizeof(dp.irDataOn)/sizeof(uint16_t))-1))
 	{
-		long number = atol(currentBlock);
+		ulong number = atol(currentBlock);
 		if (number >= 0 && number < 65536)
 		{
 			Serial.print(number);

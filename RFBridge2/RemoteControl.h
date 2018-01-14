@@ -27,7 +27,7 @@ public:
 			}
 			else if (dp->irhz != 0)
 			{
-				for (int i = 0; i < sizeof(measure.irDataOff) / sizeof(uint16_t); i++)
+				for (int i = 0; i <(int)(sizeof(measure.irDataOff) / sizeof(uint16_t)); i++)
 				{
 					Serial.println("ir");
 					if (dp->irDataOff[i] == 0xc1a0)
@@ -61,7 +61,7 @@ public:
 			else if (dp->irhz != 0)
 			{
 				Serial.println("ir");
-				for (int i = 0; i < sizeof(measure.irDataOn) / sizeof(uint16_t); i++)
+				for (int i = 0; i <(int)(sizeof(measure.irDataOn) / sizeof(uint16_t)); i++)
 				{
 					if (dp->irDataOn[i] == 0xc1a0)
 					{
