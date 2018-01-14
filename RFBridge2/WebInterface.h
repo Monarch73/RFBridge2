@@ -47,6 +47,7 @@ private:
 	static char *_hueId;
 	static void SendJson(DataJsonInterface *);
 	static String GetLightsList();
+	static void ParseStringNumbers(String& data, uint16_t*numbers);
 };
 
 #endif

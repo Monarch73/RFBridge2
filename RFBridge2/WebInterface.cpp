@@ -61,13 +61,11 @@ void WebInterface::HandleESocket()
 				{
 					if (onoff == 1)
 					{
-						Serial.println("turning light on");
 						RemoteControl::Send(&dp, true);
 						lightStates[i] = true;
 					}
 					else
 					{
-						Serial.println("turning light off");
 						RemoteControl::Send(&dp, false);
 						lightStates[i] = false;
 					}
@@ -338,6 +336,10 @@ void WebInterface::HandleEStore()
 	String c3 = _myServer->arg("tri2");
 	String d1 = _myServer->arg("url1");
 	String d2 = _myServer->arg("url2");
+	String hz = _myServer->arg("irhz");
+	String dataOn = _myServer->arg("iron");
+	String dataOff = _myServer->arg("iroff");
+
 	Serial.println("storing");
 	Serial.println(a);
 	Serial.println(b);
@@ -364,11 +366,48 @@ void WebInterface::HandleEStore()
 		dp.tri2[sizeof(dp.tri2) - 1] = 0;
 		dp.urlOff[sizeof(dp.urlOff) - 1] = 0;
 		dp.urlOn[sizeof(dp.urlOn) - 1] = 0;
+		if (hz == "" || atol(hz.c_str())==0)
+		{
+			dp.irhz = 0;
+			dp.irDataOn[0] = 0xc1a0;
+		}
+		else
+		{
+			dp.irhz = (uint16_t)atol(hz.c_str());
+			ParseStringNumbers(dataOn, (uint16_t *) &dp.irDataOn);
+			ParseStringNumbers(dataOff, (uint16_t *)&dp.irDataOff);
+		}
+			
 		estore->dipSwitchSave(no, &dp);
 	}
 
 	_myServer->send(200, "");
 
+}
+
+void WebInterface::ParseStringNumbers(String& data, uint16_t*numbers)
+{
+	typedef struct dipswitches_struct dipswitch;
+	dipswitch dp;
+
+	Serial.println("parsing " + data);
+
+	int currentNumber=0;
+	char *myData = (char *)data.c_str();
+	char *currentBlock = strtok(myData, ",");
+	while (currentBlock != NULL && currentNumber<(sizeof(dp.irDataOn)/sizeof(uint16_t))-1)
+	{
+		long number = atol(currentBlock);
+		if (number >= 0 && number < 65536)
+		{
+			Serial.print(number);
+			numbers[currentNumber++] = number;
+		}
+
+		currentBlock = strtok(NULL, ",");
+	}
+	numbers[currentNumber] = 0xc1a0;
+	Serial.println(" done");
 }
 
 void WebInterface::HandleSetupRoot()
