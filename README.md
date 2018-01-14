@@ -20,5 +20,6 @@ execute get.py in hardware/esp8266/esp8266/tools
 cd hardware/esp8266/esp8266/tools
 python get.py
 ```
-Start Arduino IDE and configure the newly cloned "RFBridge2" directory as your sketchbook-folder in settings. (ctrl ,)
-Ignore popup about availability of updates for libraries. Don't update! The versions of the submodules are release verions. 
+Start Arduino IDE and configure the newly cloned "RFBridge2" directory as your sketchbook-folder in settings. (ctrl ,). Open RFBridge2.ino. Ignore popup about availability of updates for libraries. Don't update! The versions of the submodules are release verions. 
+
+done
