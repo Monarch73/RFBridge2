@@ -19,7 +19,7 @@ public:
 		dipswitch measure;
 		if (onoff == false)
 		{
-			Serial.print("Turn Off ");
+			Serial.print("Turn Off via ");
 			if (strlen(dp->tri2) > 2)
 			{
 				Serial.println("tristate");
@@ -27,13 +27,13 @@ public:
 			}
 			else if (dp->irhz != 0)
 			{
+				Serial.println("ir");
+
 				for (int i = 0; i <(int)(sizeof(measure.irDataOff) / sizeof(uint16_t)); i++)
 				{
-					Serial.println("ir");
 					if (dp->irDataOff[i] == 0xc1a0)
 					{
-						Serial.println("Sending bytes count: " + String(i - 1));
-						_myIr->sendRaw(dp->irDataOff, i - 1, dp->irhz);
+						_myIr->sendRaw(dp->irDataOff, i , dp->irhz);
 						break;
 					}
 				}
@@ -52,7 +52,7 @@ public:
 		}
 		else
 		{
-			Serial.print("Turn On ");
+			Serial.print("Turn On via ");
 			if (strlen(dp->tri1) > 2)
 			{
 				Serial.println("tristate");
@@ -65,8 +65,7 @@ public:
 				{
 					if (dp->irDataOn[i] == 0xc1a0)
 					{
-						Serial.println("Sending bytes count: " + String(i - 1));
-						_myIr->sendRaw(dp->irDataOn, i - 1, dp->irhz);
+						_myIr->sendRaw(dp->irDataOn, i, dp->irhz);
 						break;
 					}
 				}

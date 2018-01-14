@@ -35,7 +35,8 @@ void on(HandlerFunction fn, const String &wcUri, HTTPMethod method, char wildcar
 void setup() {
 	Serial.begin(115200);
 	mySwitch.enableTransmit(2);
-	myIr = new IRsend(4);
+	myIr = new IRsend(3);
+	myIr->begin();
 	
 	int zahl = analogRead(A0);
 	Serial.println(zahl);
