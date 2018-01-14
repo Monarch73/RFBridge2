@@ -9,14 +9,16 @@ RFBridge with Phillips Hue Emulation
 	
 - Directions
 
-	- Clone repository recursivly
-```bash
+Clone repository recursivly
+```
 git clone --recursive https://github.com/Monarch73/RFBridge2.git
 ```
-	- execute get.py in hardware/esp8266/esp8266/tools
+
+execute get.py in hardware/esp8266/esp8266/tools
+
 ```bash
 cd hardware/esp8266/esp8266/tools
 python get.py
 ```
-	- Start Arduino IDE and configure the newly cloned "RFBridge2" directory as your sketchbook-folder in settings. (ctrl ,)
-	- Ignore popup about availability of updates for libraries. Don't update! The versions of the submodules are release verions. 
+Start Arduino IDE and configure the newly cloned "RFBridge2" directory as your sketchbook-folder in settings. (ctrl ,)
+Ignore popup about availability of updates for libraries. Don't update! The versions of the submodules are release verions. 
