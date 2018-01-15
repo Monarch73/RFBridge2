@@ -10,6 +10,8 @@ The release file is designed to run on D1-Mini-R2, NodeMCU and ESP-01 compatible
 Just download the esp8266 flash tool from [github](https://github.com/nodemcu/nodemcu-flasher)
 and flash the latest released rfbridge2.bin. 
 
+Check [here](https://github.com/Monarch73/RFBridge2/releases)
+
 Sometimes it might be nessesary to erase the flash storage that is hooked up to you esp8266. In this case I recommend the Esp8266-Download-tool from Expressif.
 
 # Wiring
