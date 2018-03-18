@@ -5,7 +5,6 @@
  Author:	niels
 */
 
-// the setup function runs once when you press reset or power the board
 #include "WcFnRequestHandler.h"
 #include "WebInterface.h"
 #include "EStore.h"
@@ -29,6 +28,24 @@ typedef std::function<void(WcFnRequestHandler *, String, HTTPMethod)> HandlerFun
 
 void on(HandlerFunction fn, const String &wcUri, HTTPMethod method, char wildcard = '*') {
 	server->addHandler(new WcFnRequestHandler(fn, wcUri, method, wildcard));
+}
+
+void EnterApMode()
+{
+	WiFi.mode(WIFI_AP);
+	Serial.println("WiFi Failed.Entering setup mode.");
+	Serial.println("No ssid defined");
+	/* You can remove the password parameter if you want the AP to be open. */
+	WiFi.softAP("EasyAlexa");
+
+	IPAddress myIP = WiFi.softAPIP();
+	Serial.print("AP IP address: ");
+	Serial.println(myIP);
+	server = new ESP8266WebServer(80);
+	WebInterface::SetDevices(&mySwitch, server, "", myIr);
+	server->on("/", HTTP_GET, WebInterface::HandleSetupRoot);
+	server->on("/setup", HTTP_POST, WebInterface::handleSetupSSID);
+	server->begin();
 }
 
 
@@ -57,18 +74,7 @@ void setup() {
 
 	if (WebInterface::estore->ssid[0] == 0)
 	{
-		Serial.println("No ssid defined");
-		/* You can remove the password parameter if you want the AP to be open. */
-		WiFi.softAP("EasyAlexa");
-
-		IPAddress myIP = WiFi.softAPIP();
-		Serial.print("AP IP address: ");
-		Serial.println(myIP);
-		server = new ESP8266WebServer(80);
-		WebInterface::SetDevices(&mySwitch, server, hueId.c_str(), myIr);
-		server->on("/", HTTP_GET, WebInterface::HandleSetupRoot);
-		server->on("/setup", HTTP_POST, WebInterface::handleSetupSSID);
-		server->begin();
+		EnterApMode();
 		return;
 	}
 
@@ -77,20 +83,7 @@ void setup() {
 	zahl = 0;
 	if (WiFi.waitForConnectResult() != WL_CONNECTED)
 	{
-		Serial.println("WiFi Failed.Entering setup mode.");
-		Serial.println("No ssid defined");
-		/* You can remove the password parameter if you want the AP to be open. */
-		WiFi.softAP("EasyAlexa");
-
-		IPAddress myIP = WiFi.softAPIP();
-		Serial.print("AP IP address: ");
-		Serial.println(myIP);
-		server = new ESP8266WebServer(80);
-		WebInterface::SetDevices(&mySwitch, server,hueId.c_str(), myIr);
-		server->on("/", HTTP_GET, WebInterface::HandleSetupRoot);
-		server->on("/setup", HTTP_POST, WebInterface::handleSetupSSID);
-		server->begin();
-
+		EnterApMode();
 		return;
 	}
 
@@ -101,7 +94,7 @@ void setup() {
 	server = new ESP8266WebServer(80);
 	WebInterface::SetDevices(&mySwitch, server, hueId.c_str(), myIr);
 	on(WebInterface::ConfigFn, "/api/*/config", HTTP_ANY);
-	on(WebInterface::LightFn, "/api/*/lights/*", HTTP_ANY);
+	on(WebInterface::LightsFn, "/api/*/lights/*", HTTP_ANY);
 	on(WebInterface::LightControlFn, "/api/*/lights/*/state", HTTP_ANY);
 	on(WebInterface::LightsFn, "/api/*/lights", HTTP_ANY);
 	on(WebInterface::WholeConfigFn, "/api", HTTP_ANY);
