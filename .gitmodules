@@ -7,3 +7,6 @@
 [submodule "libraries/irremote"]
 	path = libraries/irremote
 	url = https://github.com/markszabo/IRremoteESP8266.git
+[submodule "hardware/esp8266/esp8266"]
+	path = hardware/esp8266/esp8266
+	url = https://github.com/esp8266/Arduino.git
