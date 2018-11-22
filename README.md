@@ -1,7 +1,11 @@
 # RFBridge2
+
+This Project has been abandoned. Please head over to https://github.com/Monarch73/MicroHomebridgeAlexaEsp8266
+
 This Project uses an esp8266 board as a hub to control RF-Switches via Amazon Echo (Alexa) by emulating a Phillips Hue Bridge.
 
 Status of this dokumentation is incomplete. Parts that still need work are marked by @@todo
+
 
 
 # Flashing the release.
